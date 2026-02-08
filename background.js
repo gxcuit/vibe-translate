@@ -1,28 +1,29 @@
-// Deep Translate Background Service Worker
+// Vibe Translate Background Service Worker
+import { DEFAULTS } from './constants.js';
 
 // Create context menu when extension is installed
 chrome.runtime.onInstalled.addListener(() => {
     // Create parent menu
     chrome.contextMenus.create({
-        id: 'deep-translate',
+        id: 'vibe-translate',
         title: 'Vibe Translate',
         contexts: ['selection']
     });
 
     // Create translate submenu
     chrome.contextMenus.create({
-        id: 'deep-translate-action',
-        parentId: 'deep-translate',
+        id: 'vibe-translate-action',
+        parentId: 'vibe-translate',
         title: 'Translate',
         contexts: ['selection']
     });
 
-    console.log('[Deep Translate] Context menu created');
+    console.log('[Vibe Translate] Context menu created');
 });
 
 // Handle context menu clicks
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-    if (info.menuItemId === 'deep-translate-action' && tab?.id) {
+    if (info.menuItemId === 'vibe-translate-action' && tab?.id) {
         try {
             // Send message to content script to extract context
             const response = await chrome.tabs.sendMessage(tab.id, {
@@ -31,13 +32,13 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
             });
 
             if (response) {
-                console.log('[Deep Translate] Context received:', response);
+                console.log('[Vibe Translate] Context received:', response);
 
                 // Call LLM API for translation
                 await translateWithLLM(response, tab.id);
             }
         } catch (error) {
-            console.error('[Deep Translate] Error:', error.message);
+            console.error('[Vibe Translate] Error:', error.message);
             // Notify content script of error
             chrome.tabs.sendMessage(tab.id, {
                 action: 'showTranslationResult',
@@ -66,13 +67,9 @@ async function translateWithLLM(context, tabId) {
         throw new Error('API token not configured. Please set up in extension settings.');
     }
 
-    // Default prompts
-    const defaultSystemPrompt = 'You are a professional translator. Translate the following text to Chinese accurately and naturally, preserving the original meaning and tone.';
-    const defaultUserMessage = 'Translate: {{text}}\n\nContext:\nPrevious sentence: {{previousSentence}}\nNext sentence: {{nextSentence}}';
-
-    // Build the user message with placeholders replaced
-    const systemPrompt = settings.systemPrompt || defaultSystemPrompt;
-    let userMessage = settings.userMessage || defaultUserMessage;
+    // Build the user message with placeholders replaced (use DEFAULTS as fallback)
+    const systemPrompt = settings.systemPrompt || DEFAULTS.SYSTEM_PROMPT;
+    let userMessage = settings.userMessage || DEFAULTS.USER_MESSAGE;
 
     userMessage = userMessage
         .replace(/\{\{text\}\}/g, context.selectedText || '')

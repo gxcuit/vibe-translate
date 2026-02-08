@@ -1,20 +1,8 @@
-// Deep Translate Popup JavaScript
+// Vibe Translate Popup JavaScript
+import { DEFAULTS } from '../constants.js';
 
-// Default base URLs for each provider
-const PROVIDER_DEFAULTS = {
-  openai: {
-    baseUrl: 'https://api.openai.com',
-    model: 'gpt-4'
-  },
-  gemini: {
-    baseUrl: 'https://generativelanguage.googleapis.com',
-    model: 'gemini-2.0-flash'
-  }
-};
-
-// Default prompts
-const DEFAULT_SYSTEM_PROMPT = 'You are a professional translator. Translate the following text to English accurately and naturally, preserving the original meaning and tone.';
-const DEFAULT_USER_MESSAGE = 'Translate: {{text}}\n\nContext:\nPrevious sentence: {{previousSentence}}\nNext sentence: {{nextSentence}}';
+// Use provider defaults from constants
+const PROVIDER_DEFAULTS = DEFAULTS.PROVIDERS;
 
 // DOM Elements
 const form = document.getElementById('settings-form');
@@ -126,14 +114,14 @@ async function loadSettings() {
     if (result.systemPrompt) {
       systemPromptInput.value = result.systemPrompt;
     } else {
-      systemPromptInput.value = DEFAULT_SYSTEM_PROMPT;
+      systemPromptInput.value = DEFAULTS.SYSTEM_PROMPT;
     }
 
     // Load user message template
     if (result.userMessage) {
       userMessageInput.value = result.userMessage;
     } else {
-      userMessageInput.value = DEFAULT_USER_MESSAGE;
+      userMessageInput.value = DEFAULTS.USER_MESSAGE;
     }
 
     // Update placeholder

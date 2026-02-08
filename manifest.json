@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Vibe Translate",
   "version": "1.0.0",
-  "description": "English translation powered by GenAI (OpenAI & Gemini)",
+  "description": "Context-aware translation powered by GenAI (OpenAI & Gemini)",
   "permissions": [
     "storage",
     "contextMenus"
@@ -22,7 +22,8 @@
     "128": "icons/icon128.png"
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "content_scripts": [
     {
