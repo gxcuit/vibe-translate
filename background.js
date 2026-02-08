@@ -67,7 +67,7 @@ async function translateWithLLM(context, tabId) {
     }
 
     // Default prompts
-    const defaultSystemPrompt = 'You are a professional translator. Translate the following text to English accurately and naturally, preserving the original meaning and tone.';
+    const defaultSystemPrompt = 'You are a professional translator. Translate the following text to Chinese accurately and naturally, preserving the original meaning and tone.';
     const defaultUserMessage = 'Translate: {{text}}\n\nContext:\nPrevious sentence: {{previousSentence}}\nNext sentence: {{nextSentence}}';
 
     // Build the user message with placeholders replaced
@@ -119,13 +119,32 @@ async function translateWithLLM(context, tabId) {
 }
 
 /**
+ * Normalize API URL: remove trailing slashes, check for existing path
+ * Following Cherry Studio's approach for robust URL handling
+ */
+function normalizeApiUrl(baseUrl, endpoint) {
+    // Remove trailing slashes
+    let url = baseUrl.replace(/\/+$/, '');
+
+    // Check if the endpoint path already exists in the URL
+    if (!url.includes(endpoint)) {
+        url = `${url}/${endpoint}`;
+    }
+
+    return url;
+}
+
+/**
  * Call OpenAI-compatible API
  */
 async function callOpenAIAPI(settings, systemPrompt, userMessage) {
     const baseUrl = settings.baseUrl || 'https://api.openai.com';
     const model = settings.model || 'gpt-4';
 
-    const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+    // Normalize URL: handle trailing slashes and existing path
+    const apiUrl = normalizeApiUrl(baseUrl, 'v1/chat/completions');
+
+    const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -155,11 +174,26 @@ async function callOpenAIAPI(settings, systemPrompt, userMessage) {
  * Call Gemini API
  */
 async function callGeminiAPI(settings, systemPrompt, userMessage) {
-    const baseUrl = settings.baseUrl || 'https://generativelanguage.googleapis.com';
+    let baseUrl = settings.baseUrl || 'https://generativelanguage.googleapis.com';
     const model = settings.model || 'gemini-2.0-flash';
 
-    const response = await fetch(
-        `${baseUrl}/v1beta/models/${model}:generateContent?key=${settings.apiToken}`,
+    // Normalize URL: remove trailing slashes
+    baseUrl = baseUrl.replace(/\/+$/, '');
+
+    // Build endpoint - check if v1beta path already exists
+    let apiUrl;
+    if (baseUrl.includes('v1beta/models') || baseUrl.includes('v1/models')) {
+        // User provided full path including version, just append the action
+        apiUrl = `${baseUrl}/${model}:generateContent?key=${settings.apiToken}`;
+    } else if (baseUrl.includes('v1beta') || baseUrl.includes('v1')) {
+        // Has version but not models path
+        apiUrl = `${baseUrl}/models/${model}:generateContent?key=${settings.apiToken}`;
+    } else {
+        // Default: add full path
+        apiUrl = `${baseUrl}/v1beta/models/${model}:generateContent?key=${settings.apiToken}`;
+    }
+
+    const response = await fetch(apiUrl,
         {
             method: 'POST',
             headers: {
