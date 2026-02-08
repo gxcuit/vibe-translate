@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Agent folder
+.agent/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.log

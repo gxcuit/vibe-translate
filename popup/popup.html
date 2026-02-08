@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vibe Translate Settings</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="title">Vibe Translate</h1>
+      <p class="subtitle">GenAI Translation Settings</p>
+    </header>
+
+    <form id="settings-form" class="form">
+      <div class="form-group">
+        <label for="provider-type" class="label">Provider</label>
+        <select id="provider-type" class="select" required>
+          <option value="openai">OpenAI</option>
+          <option value="gemini">Gemini</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="base-url" class="label">Base URL</label>
+        <input type="url" id="base-url" class="input" placeholder="https://api.openai.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="model" class="label">Model</label>
+        <input type="text" id="model" class="input" placeholder="gpt-4" required>
+      </div>
+
+      <div class="form-group">
+        <label for="api-token" class="label">API Token</label>
+        <div class="input-wrapper">
+          <input type="password" id="api-token" class="input" placeholder="sk-..." required>
+          <button type="button" id="toggle-visibility" class="toggle-btn" aria-label="Toggle visibility">
+            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="system-prompt" class="label">System Prompt</label>
+        <textarea id="system-prompt" class="textarea"
+          placeholder="You are a professional translator. Translate the following text to English accurately and naturally."
+          rows="3"></textarea>
+        <span class="hint">Instructions for the AI model</span>
+      </div>
+
+      <div class="form-group">
+        <label for="user-message" class="label">User Message Template</label>
+        <textarea id="user-message" class="textarea"
+          placeholder="Translate: {{text}}&#10;&#10;Context:&#10;Previous: {{previousSentence}}&#10;Next: {{nextSentence}}"
+          rows="4"></textarea>
+        <span class="hint">Use {{text}}, {{previousSentence}}, {{nextSentence}} as placeholders</span>
+      </div>
+
+      <button type="submit" class="submit-btn">
+        <span class="btn-text">Save Settings</span>
+        <span class="btn-icon">✓</span>
+      </button>
+
+      <div id="status-message" class="status-message"></div>
+    </form>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
